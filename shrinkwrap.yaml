@@ -23,6 +23,7 @@ dependencies:
   jsonfile: 4.0.0
   kaori: 1.1.4
   lodash: 4.17.10
+  merge-images: 1.1.0
   node-opus: 0.3.0
   nodemailer: 4.6.5
   npm: 6.1.0
@@ -1699,6 +1700,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=
+  /merge-images/1.1.0:
+    dev: false
+    resolution:
+      integrity: sha512-RNRb9+NR/LqyKKD6AyMNT66R5BVh9y3WrFB6OqrnN38M+EwST4gxjC0luZO6H8xgpSBQ3LNq/ELtRFsDfHNsng==
   /methods/1.1.2:
     dev: false
     engines:
@@ -3243,6 +3248,7 @@ specifiers:
   jsonfile: ^4.0.0
   kaori: ^1.1.4
   lodash: ^4.17.10
+  merge-images: ^1.1.0
   node-opus: ^0.3.0
   nodemailer: ^4.6.5
   npm: ^6.1.0

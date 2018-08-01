@@ -69,6 +69,7 @@ const {
 var request1 = require('request');
 var qr = require('qr-image');
 var path = require('path');
+var mergeImages = require('merge-images');
 
 
 //Setup the queue system for music
@@ -138,38 +139,41 @@ Bot.on('guildMemberAdd', (guildMember) => {
   
   var urlWel = "https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fdie3.png?1533031819132";
   var urlUser = "https://cdn.discordapp.com/avatars/" + guildMember.id + "/" + guildMember.avatar + ".png?size=256";
-  request1(urlUser).pipe(fs.createWriteStream(guildMember.id+'avatar.png'));
-  request1(urlWel).pipe(fs.createWriteStream('welcomeavatar.png'));
-  request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fcoolvetica_rg.ttf?1533094855644").pipe(fs.createWriteStream('/fonts/coolfont.ttf'));
+  request1(urlUser).pipe(fs.createWriteStream('./'+guildMember.id+'avatar.png'));
+  request1(urlWel).pipe(fs.createWriteStream('./welcomeavatar.png'));
+  //request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fcoolvetica_rg.ttf?1533094855644").pipe(fs.createReadStream('/fonts/coolfont.ttf'));
     var canvasSizex = 984;
     var canvasSizey = 417;
     var questionPosx = (canvasSizex / 2) - 30;
     var questionPosy = 1060;
-    var textSize = 70;
-   
+    var textSize = 60;
+ 
+    
+ 
+ 
+   var request = new PRequest();
+    request.get(urlWel, function (err, resp, data) {
+      if (err) throw err;
       var img = new Image();
-      img.src = 'welcomeavatar.png';
-   const img2 = new Image();
-      img2.src = guildMember.id+'avatar.png';
+       img.src = data;
+      console.log(data);
       var canvas = createCanvas(canvasSizex, canvasSizey);
       var ctx = canvas.getContext('2d');
+       ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
+      
+   
+   
+   
+     
             //ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
    
-img2.onload = () => ctx.drawImage(img2, 0, 0,512,512);
-img2.onerror = err => { throw err };
-   img.onload = () => ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
-img.onerror = err => { throw err };
 
+  
+ctx.fillStyle = 'rgba(255,255,255, 0.9)';
 
-      ctx.fillStyle = 'rgba(255,255,255, 0.9)';
-  function fontFile (name) {
-    console.log(path.join(__dirname, '/fonts/', name));
-  return path.join(__dirname, '/fonts/', name)
-}
-
-      registerFont(fontFile('coolfont.ttf'), {family: 'Coolvetica'})
-      ctx.font = textSize + 'px Coolvetica';
-      ctx.fillText(guildMember.user.tag, canvasSizex/2,20);
+    
+      ctx.font = textSize + 'px helvetica';
+      ctx.fillText(guildMember.user.username, canvasSizex/2,canvasSizey/2+canvasSizey/4);
       var img = canvas.toDataURL();
       var data = img.replace(/^data:image\/\w+;base64,/, "");
       var buf = new Buffer(data, 'base64');
@@ -182,7 +186,7 @@ img.onerror = err => { throw err };
       });
   
   
-
+ });
 });
 
 //When the bot is turned on, set the activity

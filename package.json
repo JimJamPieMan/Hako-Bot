@@ -36,6 +36,7 @@
     "jsonfile": "^4.0.0",
     "kaori": "^1.1.4",
     "lodash": "^4.17.10",
+    "merge-images": "^1.1.0",
     "node-opus": "^0.3.0",
     "nodemailer": "^4.6.5",
     "npm": "^6.1.0",
