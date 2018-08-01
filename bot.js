@@ -138,8 +138,12 @@ const timeoutId = setLongTimeout(() => {
 Bot.on('guildMemberAdd', (guildMember) => {
   
   var urlWel = "https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fdie3.png?1533031819132";
-  var urlUser = "https://cdn.discordapp.com/avatars/" + guildMember.id + "/" + guildMember.avatar + ".png";
-  request1(urlUser).pipe(fs.createWriteStream('./'+guildMember.id+'avatar.png'));
+  var urlUser = Bot.users.find("id",guildMember.id);
+  var urlUserA = urlUser;
+  urlUserA.displayAvatarURL
+  
+  
+  request1(urlUserA.displayAvatarURL).pipe(fs.createWriteStream('./'+guildMember.id+'avatar.png'));
   request1(urlWel).pipe(fs.createWriteStream('./welcomeavatar.png'));
   //request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fcoolvetica_rg.ttf?1533094855644").pipe(fs.createReadStream('/fonts/coolfont.ttf'));
     var canvasSizex = 984;
