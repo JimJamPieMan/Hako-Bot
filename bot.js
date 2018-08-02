@@ -50,6 +50,7 @@ var Tclient = new Twitter({
 const pg = require('phrase-generator');
 var youtubeUrl = require("youtube-url");
 const { createCanvas, loadImage, Image, registerFont } = require('canvas');
+const Canvas = require('canvas');
 
 const http = require("http");
 var PRequest = require('pixl-request');
@@ -152,18 +153,32 @@ Bot.on('guildMemberAdd', (guildMember) => {
     var questionPosy = 1060;
     var textSize = 60;
  
-    
- 
- 
-   var request = new PRequest();
-    request.get(urlWel, function (err, resp, data) {
-      if (err) throw err;
-      var img = new Image();
-       img.src = data;
-      console.log(data);
       var canvas = createCanvas(canvasSizex, canvasSizey);
       var ctx = canvas.getContext('2d');
-       ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
+ 
+
+mergeImages(['./'+guildMember.id+'avatar.png','./welcomeavatar.png'] ,{
+  Canvas: Canvas
+}).then(b64 => function(b64){
+  var base64Data = b64.replace(/^data:image\/png;base64,/, "");
+
+const img = new Image()
+img.onload = () => ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
+img.onerror = err => { throw err };
+img.src = b64;
+
+       
+});
+  
+  
+  
+
+  
+    
+
+    
+       
+     
       
    
    
@@ -178,8 +193,8 @@ ctx.fillStyle = 'rgba(255,255,255, 0.9)';
     
       ctx.font = textSize + 'px helvetica';
       ctx.fillText(guildMember.user.username, canvasSizex/2,canvasSizey/2+canvasSizey/4);
-      var img = canvas.toDataURL();
-      var data = img.replace(/^data:image\/\w+;base64,/, "");
+      var finalImg = canvas.toDataURL();
+      var data = finalImg.replace(/^data:image\/\w+;base64,/, "");
       var buf = new Buffer(data, 'base64');
       
       guildMember.guild.channels.find("name", "announcements").send({
@@ -190,7 +205,7 @@ ctx.fillStyle = 'rgba(255,255,255, 0.9)';
       });
   
   
- });
+ 
 });
 
 //When the bot is turned on, set the activity
