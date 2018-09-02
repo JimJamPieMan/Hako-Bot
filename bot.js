@@ -1,3 +1,4 @@
+
 /*TODOlist
 
 -- make the img results paginate so jack doesnt get angry
@@ -8,7 +9,19 @@
 const express = require("express")
 const expressApp = express()
 expressApp.get("/", (req, res) => res.json("OK FAM"))
+
+expressApp.get('/serverData', function(req, res) {
+    res.sendfile('./data.html');
+  
+});
+expressApp.get('/json', function(req, res) {
+  var serveriD = req.query;
+  console.log(serveriD.serverid);
+    res.sendfile('./'+serveriD.serverid+'.json');
+  
+});
 expressApp.listen(process.env.PORT)
+
 
 
 //Setup the requirements
@@ -50,7 +63,7 @@ var Tclient = new Twitter({
 const pg = require('phrase-generator');
 var youtubeUrl = require("youtube-url");
 const { createCanvas, loadImage, Image, registerFont } = require('canvas');
-const Canvas = require('canvas');
+//const Canvas = require('canvas');
 
 const http = require("http");
 var PRequest = require('pixl-request');
@@ -71,6 +84,8 @@ var request1 = require('request');
 var qr = require('qr-image');
 var path = require('path');
 var mergeImages = require('merge-images');
+const ytlist = require('youtube-playlist');
+const isPlaylist = require("is-playlist");
 
 
 //Setup the queue system for music
@@ -141,11 +156,14 @@ Bot.on('guildMemberAdd', (guildMember) => {
   var urlWel = "https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fdie3.png?1533031819132";
   var urlUser = Bot.users.find("id",guildMember.id);
   var urlUserA = urlUser;
-  urlUserA.displayAvatarURL
+  console.log(urlUserA.displayAvatarURL);
   
   
   request1(urlUserA.displayAvatarURL).pipe(fs.createWriteStream('./'+guildMember.id+'avatar.png'));
-  request1(urlWel).pipe(fs.createWriteStream('./welcomeavatar.png'));
+  //PRequest(urlWel).pipe(fs.createWriteStream('./welcomeavatar.png'));
+
+  
+
   //request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fcoolvetica_rg.ttf?1533094855644").pipe(fs.createReadStream('/fonts/coolfont.ttf'));
     var canvasSizex = 984;
     var canvasSizey = 417;
@@ -155,40 +173,19 @@ Bot.on('guildMemberAdd', (guildMember) => {
  
       var canvas = createCanvas(canvasSizex, canvasSizey);
       var ctx = canvas.getContext('2d');
- 
-
-mergeImages(['./'+guildMember.id+'avatar.png','./welcomeavatar.png'] ,{
-  Canvas: Canvas
-}).then(b64 => function(b64){
-  var base64Data = b64.replace(/^data:image\/png;base64,/, "");
-
-const img = new Image()
-img.onload = () => ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
-img.onerror = err => { throw err };
-img.src = b64;
-
-       
-});
-  
-  
-  
-
-  
-    
-
-    
-       
-     
+    var request = new PRequest();
+    request.get(urlUserA.displayAvatarURL, function (err, resp, data) {
+      if (err) throw err;
+      var img = new Image();
+      img.src = data;
       
-   
-   
-   
-     
-            //ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
-   
-
-  
-ctx.fillStyle = 'rgba(255,255,255, 0.9)';
+      ctx.drawImage(img, 114, 49, 319, 319);
+      request.get("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fdie3.png?1533031819132", function (err, resp, data) {
+      if (err) throw err;
+      var img2 = new Image();
+      img2.src = data;
+        ctx.drawImage(img2, 0, 0, canvasSizex, canvasSizey);
+      ctx.fillStyle = 'rgba(255,255,255, 0.9)';
 
     
       ctx.font = textSize + 'px helvetica';
@@ -200,10 +197,14 @@ ctx.fillStyle = 'rgba(255,255,255, 0.9)';
       guildMember.guild.channels.find("name", "announcements").send({
         files: [{
           attachment: buf,
-          name: 'is this /.png'
+          name: 'welcome.png'
         }]
       });
+        });
   
+    });
+
+
   
  
 });
@@ -211,9 +212,9 @@ ctx.fillStyle = 'rgba(255,255,255, 0.9)';
 //When the bot is turned on, set the activity
 Bot.on('ready', () => {
   Bot.user.setUsername("HakoBot");
-  setInterval(function () {
+ 
     Bot.user.setActivity("+help");
-  }, 120000);
+  
   
 console.log("Started");
 
@@ -295,8 +296,36 @@ botCount = message.guild.members.filter(filter);
   }
 
 
+  
+  if (message.content.toLowerCase().startsWith('r/')) {
+    message.channel.send("Hey that looks like reddit, ill link it for ya." +"\n"+ "https://www.reddit.com/"+message); 
+    
+  }
   //if the condition is true do them things
   if (guildConf.nonPrefixed === true) {
+    if (message.content.toLowerCase().includes('love')) {
+       if (!message.member.voiceChannel) {
+      
+      return;
+    }
+      if (!servers[message.guild.id]) {
+          servers[message.guild.id] = {
+            queue: []
+          }
+        }
+        var server = servers[message.guild.id];
+        server.queue.push("https://www.youtube.com/watch?v=TiC8pig6PGE");
+        
+        if (!message.guild.voiceConnection) {
+          message.member.voiceChannel.join().then(function (connection) {
+            playUNKnown(connection, message);
+          }).catch(err => {
+            console.log(err);
+            
+          });
+        }
+      
+    }
     if (message.content.toLowerCase().includes('ali')) {
        if (!message.member.voiceChannel) {
       
@@ -308,7 +337,31 @@ botCount = message.guild.members.filter(filter);
           }
         }
         var server = servers[message.guild.id];
-        server.queue.push("https://www.youtube.com/watch?v=i8nJAz_n7go");
+        server.queue.push("https://www.youtube.com/watch?v=wiEo1PFB090");
+        
+        if (!message.guild.voiceConnection) {
+          message.member.voiceChannel.join().then(function (connection) {
+            playUNKnown(connection, message);
+          }).catch(err => {
+            console.log(err);
+            
+          });
+        }
+      
+    }
+    
+    if (message.content.toLowerCase().includes('love')) {
+       if (!message.member.voiceChannel) {
+      
+      return;
+    }
+      if (!servers[message.guild.id]) {
+          servers[message.guild.id] = {
+            queue: []
+          }
+        }
+        var server = servers[message.guild.id];
+        server.queue.push("https://www.youtube.com/watch?v=TiC8pig6PGE");
         
         if (!message.guild.voiceConnection) {
           message.member.voiceChannel.join().then(function (connection) {
@@ -377,7 +430,11 @@ botCount = message.guild.members.filter(filter);
     if (message.content.toLowerCase().includes(" vagina ") || message.content.toLowerCase().includes(" pussy ")) {
       message.react("🥑");
     }
+    
+    
+    
   }
+
  
   //Setup the prefix, commands and args
   if (message.content.indexOf(PREFIX) !== 0) return;
@@ -632,7 +689,7 @@ const timeoutId = setLongTimeout(() => { reminder_Channel[0].send(reminderMessag
       var questionToType = arrStr[1];
       var personToType = arrStr[3];
       var objectToType = arrStr[5];
-      var canvas = new Canvas(canvasSizex, canvasSizey);
+      var canvas = createCanvas(canvasSizex, canvasSizey);
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
       ctx.fillStyle = 'rgba(0, 0, 0, 1)';
@@ -1196,7 +1253,7 @@ const timeoutId = setLongTimeout(() => { reminder_Channel[0].send(reminderMessag
       var img = new Image();
       img.src = data;
       var textToType = args.join(" ");
-      var canvas = new Canvas(canvasSizex, canvasSizey);
+      var canvas = new createCanvas(canvasSizex, canvasSizey);
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvasSizex, canvasSizey);
       ctx.fillStyle = 'rgba(39, 101, 142, 1)';
@@ -1621,7 +1678,7 @@ for(var i = 0; i < data.serverData.grantableRoles.length; i++) {
             data = JSON.parse(data);
       
       
-      if (!data.serverData.grantableRoles.includes(removegrantrole.id)) {
+      if (!data.serverData.grantableRoles.includes(roleToRemove.id)) {
         message.channel.send("Cannot remove a role if it is not a grantable role.");
         
         return;
@@ -2487,6 +2544,20 @@ var vol = (args[0]/100);
       message.channel.stopTyping();
     });
   }
+  
+  function playSC(connection, songURL){
+    // master
+const req = require("request");
+const stream = req({
+    url: songURL,
+    followAllRedirects: true,
+    qs: {
+        client_id: "NZtb1cCBbHFHV67f1Fp9jkGKog0H4StA"
+    },
+    encoding: null
+});
+connection.play(stream);
+  };
 
   //music function
   function playBEKnown(connection, message) {
@@ -2507,6 +2578,7 @@ var vol = (args[0]/100);
       }
       let dataObj = JSON.parse(fs.readFileSync("./data.json", "utf8"));
       var dataFooter = Math.floor(Math.random() * dataObj.saying.length);
+      Bot.user.setActivity(videoInfo.title);
       const embed = {
         "title": "nowPlaying() " + "'" + videoInfo.title + "'",
         "description": normalDes,
@@ -2547,6 +2619,7 @@ var vol = (args[0]/100);
       } else {
         connection.disconnect();
         message.channel.send("k. done");
+        Bot.user.setActivity("+help");
       }
     });
   }
@@ -2568,15 +2641,145 @@ var vol = (args[0]/100);
     server.queue.shift();
     server.dispatcher.on("end", function () {
       if (server.queue[0]) {
-        setTimeout(() => playUNKnown(connection, message), 200)
-        if (!command === "stop") {
-          
+        setTimeout(() => playUNKnown(connection, message), 200);
+     if (!command === "stop") {
+          message.channel.send("i am playing the next song in the queue motherfuckerrrrrr");
         }
       } else {
         connection.disconnect();
-  
+        message.channel.send("k. done");
       }
-    });
+    
+  });
+  }
+  
+  if (command==="showqueue"){
+    var server = servers[message.guild.id];
+    var nameArr = [];
+    var count = 1;
+    for (var i = 0;i<server.queue.length;i++){
+      
+     var vidIDforSearch = getVideoId(server.queue[i]).id;
+    fetchVideoInfo(vidIDforSearch, function (err, videoInfo) {
+  if (err) throw new Error(err);
+  message.channel.send("Position in queue:"+count+" "+videoInfo.title);
+});
+      count++
+    }
+    
+    // message.channel.send("```"+nameArr.join("\n")+"```");
+   
+    
+  }
+             //Plays music, pretty simple
+  if (command === "playSC") {
+    if (!message.member.voiceChannel) {
+      message.channel.send("if you want to hear me get in a fucking voice channel you cuck");
+      return;
+    }
+    if (!args[0]) {
+      message.channel.send(message.author + " ***FEED ME either a youtube url or search term***");
+      return;
+    } 
+    var songURL = args[0];
+      message.channel.send("i added that bitch to the queueueueuueueueueuueueueueu");
+        if (!message.guild.voiceConnection) {
+          message.member.voiceChannel.join().then(function (connection) {
+            playSC(connection, songURL);
+          }).catch(err => {
+            console.log(err);
+            message.channel.send(message.author + " i cant play for some reason, hmm. (check if my permissions are okay)");
+          });
+        }
+      } 
+//Plays music, pretty simple
+  if (command === "unplay") {
+    if (!message.member.voiceChannel) {
+      message.author.send("if you want to hear me get in a fucking voice channel you cuck");
+      return;
+    }
+    if (!args[0]) {
+      message.author.send(message.author + " ***FEED ME either a youtube url or search term***");
+      return;
+    }
+    if (message.content.includes("http://") || message.content.includes("https://")) {
+      if (message.content.includes("youtube") || message.content.includes("youtu.be")) {
+        
+        message.delete();
+         if (!servers[message.guild.id]) {
+          servers[message.guild.id] = {
+            queue: []
+          }
+        }
+        
+       if (youtubeUrl.valid(args[0]) == true) {
+          var server = servers[message.guild.id];
+            server.queue.push(args[0]);
+       }
+        
+        
+        else if (isPlaylist(args[0])==true){
+            ytlist(args[0], 'url').then(res => {
+  console.log(res);
+  console.log(res.data.playlist);
+  for (var i = 0;i<res.data.playlist.length;i++){
+    var server = servers[message.guild.id];
+     server.queue.push(res.data.playlist[i]);
+    console.log(res.data.playlist[i]);
+  }
+            });
+
+          }else {
+            message.author.send("not a valid thing thanger");
+            return;
+          }
+       
+        
+        
+        
+        message.author.send("i added that bitch to the queueueueuueueueueuueueueueu");
+        if (!message.guild.voiceConnection) {
+          message.member.voiceChannel.join().then(function (connection) {
+            playUNKnown(connection, message);
+          }).catch(err => {
+            console.log(err);
+            message.author.send(message.author + " i cant play for some reason, hmm. (check if my permissions are okay)");
+          });
+        }
+      } else {
+        message.author.send(message.author + ' only youtube links are allowed you fucking fucccck');
+      }
+    } else {
+      var opts = {
+        maxResults: 50,
+        key: process.env.youtubeapi,
+        type: 'video'
+      };
+      var searchTerm = args.join("_"); 
+      search(searchTerm, opts, function (err, results) {
+        if (err) {
+          console.log(err);
+          message.author.send("maybe try a different search term");
+          return;
+        }
+        var searchUrl = results[0].link;
+        message.author.send(searchUrl);
+        if (!servers[message.guild.id]) {
+          servers[message.guild.id] = {
+            queue: []
+          }
+        }
+        var server = servers[message.guild.id];
+        server.queue.push(searchUrl);
+        message.author.send("i added that bitch to the queueueueuueueueueuueueueueu");
+
+        if (!message.guild.voiceConnection) {
+          message.member.voiceChannel.join().then(function (connection) {
+           playUNKnown(connection, message);
+          });
+        }
+      });
+    }
   }
 
 
@@ -2592,17 +2795,37 @@ var vol = (args[0]/100);
     }
     if (message.content.includes("http://") || message.content.includes("https://")) {
       if (message.content.includes("youtube") || message.content.includes("youtu.be")) {
-        if (youtubeUrl.valid(args[0]) == false) {
-          message.channel.send("not a proper youtube link you bitch");
-          return;
-        }
-        if (!servers[message.guild.id]) {
+         if (!servers[message.guild.id]) {
           servers[message.guild.id] = {
             queue: []
           }
         }
-        var server = servers[message.guild.id];
-        server.queue.push(args[0]);
+        
+       if (youtubeUrl.valid(args[0]) == true) {
+          var server = servers[message.guild.id];
+            server.queue.push(args[0]);
+       }
+        
+        
+        else if (isPlaylist(args[0])==true){
+            ytlist(args[0], 'url').then(res => {
+  console.log(res);
+  console.log(res.data.playlist);
+  for (var i = 0;i<res.data.playlist.length;i++){
+    var server = servers[message.guild.id];
+     server.queue.push(res.data.playlist[i]);
+    console.log(res.data.playlist[i]);
+  }
+            });
+
+          }else {
+            message.channel.send("not a valid thing thanger");
+            return;
+          }
+       
+        
+        
+        
         message.channel.send("i added that bitch to the queueueueuueueueueuueueueueu");
         if (!message.guild.voiceConnection) {
           message.member.voiceChannel.join().then(function (connection) {
