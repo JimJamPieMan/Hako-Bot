@@ -10,16 +10,7 @@ const express = require("express")
 const expressApp = express()
 expressApp.get("/", (req, res) => res.json("OK FAM"))
 
-expressApp.get('/serverData', function(req, res) {
-    res.sendfile('./data.html');
-  
-});
-expressApp.get('/json', function(req, res) {
-  var serveriD = req.query;
-  console.log(serveriD.serverid);
-    res.sendfile('./'+serveriD.serverid+'.json');
-  
-});
+
 expressApp.listen(process.env.PORT)
 
 
@@ -86,6 +77,19 @@ var path = require('path');
 var mergeImages = require('merge-images');
 const ytlist = require('youtube-playlist');
 const isPlaylist = require("is-playlist");
+const requestImageSize = require('request-image-size');
+var sizeOf = require('image-size');
+var franc = require('franc');
+var imgur = require('imgur');
+
+var spotifyUri = require('spotify-uri');
+var parsed, uri;
+
+const SpotifyWrapper = require('spotify-w').default;
+ 
+const spotify = new SpotifyWrapper({
+  token: process.env.spotifyID
+});
 
 
 //Setup the queue system for music
@@ -145,7 +149,8 @@ const timeoutId = setLongTimeout(() => {
   if (err) throw err;
   console.log('The file has been saved!');
 });
-    });}, countdown);
+    });
+}, countdown);
 // stop timeout with ID returned
 
 }
@@ -194,7 +199,7 @@ Bot.on('guildMemberAdd', (guildMember) => {
       var data = finalImg.replace(/^data:image\/\w+;base64,/, "");
       var buf = new Buffer(data, 'base64');
       
-      guildMember.guild.channels.find("name", "announcements").send({
+      guildMember.guild.channels.find("name", "joiners").send({
         files: [{
           attachment: buf,
           name: 'welcome.png'
@@ -238,6 +243,8 @@ console.log("Started");
   
   
 });
+
+
 
 
 
@@ -434,12 +441,205 @@ botCount = message.guild.members.filter(filter);
     
     
   }
+  if (message.content.toLowerCase().includes("i nutted")) {
+     
+message.member.setNickname(message.author.username);
+
+
+    }
+  
+  
+    if (message.content.toLowerCase().includes("ricegum") || message.content.toLowerCase().includes(" ricegum ")) {
+      message.delete();
+    }
+//   var bananaCount = 0;
+//   if (message.content.toLowerCase().includes("banana")){
+//     bananaCount++;
+//     if (bananaCount===3){
+//       message.channel.send("terracotta");
+//       message.channel.send("banana");
+//       message.channel.send("terracotta");
+//       message.channel.send("terracotta");
+//       message.channel.send("pie");
+//     }
+    
+    
+//   }
+  // if (message.author.id===process.env.myID) {
+  //     message.delete();
+  //   }
+//    if (franc(message.content, {minLength: 3})!="eng"){
+//     message.channel.send(message.content);
+      
+//       }
+  
 
  
   //Setup the prefix, commands and args
   if (message.content.indexOf(PREFIX) !== 0) return;
   const args = message.content.slice(PREFIX.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+  
+//     if(message.author.id==="257381422694662145"){
+//     var text = args.join("_");
+//     if (text.length>10){
+//       message.guild.channels.find("id","510708161464762368").send(text);
+      
+//     }
+//   }
+  
+  if(command==="epicmarspic"){
+    
+    
+//     var rovers = ["curiosity", "opportunity","spirit"];
+//        var rover  = Math.floor(Math.random() * rovers.length)
+//       console.log(rovers[rover]);
+    
+    
+  var date = new Date();
+    
+  var year =  date.getFullYear();
+  var day = date.getDate();
+  var month = date.getMonth();
+    
+            getJSON("https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date="+year+"-"+month+"-"+day+"&api_key="+process.env.NASAAPI, function (error, response) {
+      if (response) {
+        
+   // console.log(response.photos.length);
+        var image  = Math.floor(Math.random() * response.photos.length);
+        //console.log(image);
+        
+        
+        const embed = {
+          "title": "Mars from the "+response.photos[image].camera.full_name+  " ("+response.photos[image].camera.name+") camera on the " + response.photos[image].rover.name +" rover.",
+          "color": 9442302,
+          "image": {
+            "url": response.photos[image].img_src
+          },
+          "footer": {
+            "text": day+"/"+month+"/"+year
+          }
+        };
+        message.channel.send({
+          embed
+        });
+
+      }    
+      
+                  
+      });
+
+    
+  }
+  
+  
+  if(command==="epicnasapic"){
+    
+  
+    
+            getJSON('https://api.nasa.gov/EPIC/api/natural?api_key='+process.env.NASAAPI, function (error, response) {
+      if (response) {
+        
+        var timeStamp = response[0].identifier;
+        
+
+        
+        var year = "";
+        var day = "";
+        var month = "";
+       
+            
+            year=year+timeStamp[0]+timeStamp[1]+timeStamp[2]+timeStamp[3];
+            month=month+timeStamp[4]+timeStamp[5];
+        day=day+timeStamp[6]+timeStamp[7];
+        
+        
+        const embed = {
+          "title": "Earth from DSCOVR's Earth Polychromatic Imaging Camera (EPIC) instrument",
+          "color": 9442302,
+          "image": {
+            "url": "https://api.nasa.gov/EPIC/archive/natural/"+year+"/"+month+"/"+day+"/png/"+response[0].image+".png?api_key="+process.env.NASAAPI
+          },
+          "footer": {
+            "text": day+"/"+month+"/"+year
+          }
+        };
+        message.channel.send({
+          embed
+        });
+
+      }    
+      
+                  
+      });
+
+    
+  }
+  
+  if(command==="slap"){
+    var slap = message.mentions.users.first();
+    message.channel.send("I SPLAPPED "+slap+" FOIR YA WEEEEE LAD");
+  }
+  
+//   if(command==="vicelection"){
+// //      //message.channel.startTyping();
+// //    //var endpoint = "http://www.abc.net.au/dat/news/elections/federal/2016/results/OnlinePartyGroupTrends.jsonp.js";
+    
+
+//     var request = require('request');
+// request('http://www.abc.net.au/dat/news/elections/vic/2018/results/OnlineLists.json', function (error, response, body) {
+//   console.log('error:', error); // Print the error if one occurred
+//   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+//    // body = body.replace(new RegExp("callback_OnlineLists\\(([\\s\\S]+)\\);"), "$1");
+        
+//   console.log('body:');
+//   var data = JSON.parse(body);
+//   var elecArr = data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate;
+//   //console.log(data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate.length);
+// for (var i =0;i<elecArr.length;i++){
+//   //console.log(elecArr[i].ElectoratePrediction);
+//   const embed = {
+//       "title": "Vic Election 2018 ("+elecArr[i].LongName+")",
+//       "color": 9442302,
+//       "fields": [/*{
+//         name: "Winning Party: ",
+//         value: elecArr[i].LeadingCandidateSuppressed.Party.ShortName
+//       },*/ {
+//         name: "Percentage of votes counted: ",
+//         value: elecArr[i].CountedPct
+//       }]
+//     };
+//     message.channel.send({
+//       embed
+//     });
+//  // message.channel.stopTypting();
+// }// Print the HTML for the Google homepage.
+  
+ 
+// });
+//   }
+ 
+  
+  if(command==="modmail"){
+    var mess = args.join(" ");
+    message.delete();
+    message.channel.send("ModMail sent to the mods who read mail");
+    message.author.send("You sent ModMail: "+mess);
+    
+    
+    const embed = {
+      "title": "ModMail from: "+message.author.username,
+      "color": 9442302,
+      "fields": [{
+        name: "ModMail:",
+        value: mess
+      }]
+    };
+    
+    
+    message.guild.channels.find("id","510702023566426132").send({embed});
+  }
+
   
 //   //toggle the nonprefixed commands
 //   if (command === "passwordtoggle") {
@@ -462,6 +662,88 @@ botCount = message.guild.members.filter(filter);
 //       message.channel.send("***HEY you cant push my buttons, only more powerful people can***");
 //     }
 //   }
+  
+  
+//   if (command==="drunkify"){
+//     var member = message.mentions.members.first();
+//     if (member.member.nickName==null){
+//     member.member.setNickName(member.user.userName + " (DRUNK)");
+//     }else{
+//       member.member.setNickName(member.member.nickName + " (DRUNK)");
+//     }
+//   }
+  
+  if (command==="james"){
+  var urlWel = args[0];
+  
+  //console.log(urlUserA.displayAvatarURL);
+  
+  
+  request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fjames_png.png?1536497858010");
+  //PRequest(urlWel).pipe(fs.createWriteStream('./welcomeavatar.png'));
+
+  
+
+  //request1("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fcoolvetica_rg.ttf?1533094855644").pipe(fs.createReadStream('/fonts/coolfont.ttf'));
+    var canvasSizex = 984;
+    var canvasSizey = 417;
+    var questionPosx = (canvasSizex / 2) - 30;
+    var questionPosy = 1060;
+    var textSize = 60;
+ 
+      
+    var request = new PRequest();
+    request.get(args[0], function (err, resp, data) {
+      
+var dimensions = sizeOf(data);
+ 
+      console.log(dimensions.width, dimensions.height);
+      var oWidth = dimensions.width;
+      var oHeight = dimensions.height;
+      var canvas = createCanvas(dimensions.width, dimensions.height);
+      var ctx = canvas.getContext('2d');
+      if (err) throw err;
+      var img = new Image();
+      img.src = data;
+      
+      ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+      request.get("https://cdn.glitch.com/6e120591-d41d-4957-afbf-bff45b64d5dd%2Fjames_png.png?1536497858010", function (err, resp, data1) {
+      var dimensions = sizeOf(data1);
+      var jWidth = dimensions.width;
+      var jHeight = dimensions.height;
+      console.log(dimensions.width, dimensions.height);
+      if (err) throw err;
+      var img2 = new Image();
+      img2.src = data1;
+        ctx.drawImage(img2, (oWidth/2)-(jWidth/2), (oHeight/2)-(jHeight/2), (oWidth/2)+(jWidth/2), (oHeight/2)+(jHeight/2));
+      ctx.fillStyle = 'rgba(255,255,255, 0.9)';
+
+    
+      ctx.font = textSize + 'px helvetica';
+     // ctx.fillText(guildMember.user.username, canvasSizex/2,canvasSizey/2+canvasSizey/4);
+      var finalImg = canvas.toDataURL();
+      var data = finalImg.replace(/^data:image\/\w+;base64,/, "");
+      var buf = new Buffer(data, 'base64');
+      
+      message.channel.send({
+        files: [{
+          attachment: buf,
+          name: 'welcome.png'
+        }]
+      });
+        });
+  
+    });
+
+  }
+  
+  
+  if(command ==="approved"){
+    message.channel.send({files:['https://i.imgur.com/dBpGhDi.jpg']});
+  }
+   if(command ==="unapproved"){
+    message.channel.send({files:['https://i.imgur.com/Oyhf1Ef.jpg']});
+  }
   
   
   if(command==="qr"){
@@ -2258,6 +2540,69 @@ for(var i = 0; i < data.serverData.grantableRoles.length; i++) {
       embed
     });
   }
+   if (command === "addbentley") {
+    if (!args[0]){
+      message.channel.send("I need a url to upload");
+      return;
+    }
+      
+      imgur.uploadUrl(args[0]).then(function (json) {
+        console.log(json.data.link);
+        var imgurl = json.data.link;
+        fs.readFile("./data.json", 'utf-8', (err, data) => {
+      if (err) throw err;
+    
+      var obj = JSON.parse(data);
+   
+      //now it an object
+      obj.bentley.push(imgurl);
+      var json = JSON.stringify(obj);
+      fs.writeFile("./data.json", json, 'utf-8', (err) => {
+        if (err) throw err;
+        message.channel.send("yay it worked");
+      });
+    });
+      })
+      
+    .catch(function (err) {
+        console.error(err.message);
+        message.channel.send("problem with upload");
+    });
+          
+  }
+  
+    if (command === "addmaggie") {
+    if (!args[0]){
+      message.channel.send("I need a url to upload");
+      return;
+    }
+      
+      imgur.uploadUrl(args[0]).then(function (json) {
+        console.log(json.data.link);
+        var imgurl = json.data.link;
+        fs.readFile("./data.json", 'utf-8', (err, data) => {
+      if (err) throw err;
+    
+      var obj = JSON.parse(data);
+   
+      //now it an object
+      obj.maggie.push(imgurl);
+      var json = JSON.stringify(obj);
+      fs.writeFile("./data.json", json, 'utf-8', (err) => {
+        if (err) throw err;
+        message.channel.send("yay it worked");
+      });
+    });
+      })
+      
+    .catch(function (err) {
+        console.error(err.message);
+        message.channel.send("problem with upload");
+    });
+          
+  }
+          
+          
 
   //Gives a random sex thing (idk)
   if (command === "funnysexthing") {
@@ -2561,7 +2906,13 @@ connection.play(stream);
 
   //music function
   function playBEKnown(connection, message) {
+    let dataObj = JSON.parse(fs.readFileSync("./data.json", "utf8"));
+      var dataFooter = Math.floor(Math.random() * dataObj.saying.length);
+    /////
+ 
+    /////
     var server = servers[message.guild.id];
+    //server.queue[0]
     server.dispatcher = connection.playStream(yt(server.queue[0], {
       filter: "audioonly"
     }));
@@ -2576,8 +2927,7 @@ connection.play(stream);
       if (normalDes.length > 50) {
         normalDes = normalDes.substr(0, 50) + '[...(See more)](' + videoInfo.url + ')';
       }
-      let dataObj = JSON.parse(fs.readFileSync("./data.json", "utf8"));
-      var dataFooter = Math.floor(Math.random() * dataObj.saying.length);
+      
       Bot.user.setActivity(videoInfo.title);
       const embed = {
         "title": "nowPlaying() " + "'" + videoInfo.title + "'",
@@ -2794,6 +3144,41 @@ connection.play(stream);
       return;
     }
     if (message.content.includes("http://") || message.content.includes("https://")) {
+      
+      
+//           if(args[0].startsWith("https://open.spotify.com/track/")){
+            
+//      parsed = spotifyUri.parse(args[0]);
+// console.log(parsed.id);
+ 
+
+
+// const options = {
+//   method: "GET",
+//   url: 	"https://api.spotify.com/v1/tracks/"+parsed.id,
+//   headers: {
+//     "Accept": "application/json",
+//     "Content-Type": "application/json",
+//     "Authorization": "Bearer "+process.env.spotifyID
+//   }
+// };
+
+//             function callback(error, response, body) {
+              
+//               if (error) { console.error(error);
+//                           return;
+//                          }
+//   if (!error && response.statusCode == 200) {
+//     const info = JSON.parse(body);
+//     console.log(info);
+
+//   }
+// }
+
+// request1(options, callback);
+            
+//             return;
+//                }
       if (message.content.includes("youtube") || message.content.includes("youtu.be")) {
          if (!servers[message.guild.id]) {
           servers[message.guild.id] = {
@@ -2869,6 +3254,9 @@ connection.play(stream);
         }
       });
     }
+    
+
+    
   }
    
   //skips music
@@ -2914,7 +3302,7 @@ connection.play(stream);
   if (command === "help") {
     var name = encodeURI(message.guild.name);
     var sprefix = encodeURI(PREFIX);
-    message.channel.send("heres all my commands for ya bitch, https://myywebsite.glitch.me/html/jamie.html?servername=" + name + "&prefix=" + sprefix);
+    message.channel.send("heres all my commands for ya bitch, https://myywebsite.glitch.me/html/hakobot.html?servername=" + name + "&prefix=" + sprefix);
   }
 });
 
