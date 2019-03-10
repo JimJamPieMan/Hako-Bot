@@ -10,6 +10,30 @@ const express = require("express")
 const expressApp = express()
 expressApp.get("/", (req, res) => res.json("OK FAM"))
 
+expressApp.get('/serverData', function(req, res) {
+    res.sendfile('./data.html');
+  
+});
+
+// expressApp.get('/jamessipad', function(req, res) {
+//     res.sendfile('./colour.html');
+  
+// });
+
+// expressApp.get('/jamessipadcolour', function(req, res) {
+//     res.sendfile('./colour.json');
+  
+// });
+
+
+
+expressApp.get('/json', function(req, res) {
+  var serveriD = req.query;
+  console.log(serveriD.serverid);
+    res.sendfile('./'+serveriD.serverid+'.json');
+  
+});
+
 
 expressApp.listen(process.env.PORT)
 
@@ -488,6 +512,36 @@ message.member.setNickname(message.author.username);
 //     }
 //   }
   
+  if (command==="purge"){
+    
+    if(!args[0] || isNaN(args[0])){
+       message.channel.send("mate that wasnt a good number");
+    return;
+       }
+    message.channel.bulkDelete(args[0]+1)
+  .then(messages => message.channel.send(`Bulk deleted ${messages.size-1} messages`))
+  .catch(console.error);
+  }
+  
+   if (command==="fuckyoufuckoff"){
+   if(!args[0] || !args[0].startsWith("#")){
+       message.channel.send("mate that wasnt a good number");
+    return;
+       }
+  var colour = args[0];
+         fs.readFile("./colour.json", 'utf-8', (err, data) => {
+      if (err) throw err;
+      
+      var obj = JSON.parse(data); //now it an object
+      obj.colour = args[0];
+      //add some data
+      var json = JSON.stringify(obj);
+      fs.writeFile("./colour.json", json, 'utf8', (err) => {
+        if (err) throw err;
+      });
+    });
+  }
+  
   if(command==="epicmarspic"){
     
     
@@ -581,43 +635,43 @@ message.member.setNickname(message.author.username);
     message.channel.send("I SPLAPPED "+slap+" FOIR YA WEEEEE LAD");
   }
   
-//   if(command==="vicelection"){
-// //      //message.channel.startTyping();
-// //    //var endpoint = "http://www.abc.net.au/dat/news/elections/federal/2016/results/OnlinePartyGroupTrends.jsonp.js";
+  if(command==="vicelection"){
+//      //message.channel.startTyping();
+//    //var endpoint = "http://www.abc.net.au/dat/news/elections/federal/2016/results/OnlinePartyGroupTrends.jsonp.js";
     
 
-//     var request = require('request');
-// request('http://www.abc.net.au/dat/news/elections/vic/2018/results/OnlineLists.json', function (error, response, body) {
-//   console.log('error:', error); // Print the error if one occurred
-//   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-//    // body = body.replace(new RegExp("callback_OnlineLists\\(([\\s\\S]+)\\);"), "$1");
+    var request = require('request');
+request('http://www.abc.net.au/dat/news/elections/vic/2018/results/OnlineLists.json', function (error, response, body) {
+  console.log('error:', error); // Print the error if one occurred
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+   // body = body.replace(new RegExp("callback_OnlineLists\\(([\\s\\S]+)\\);"), "$1");
         
-//   console.log('body:');
-//   var data = JSON.parse(body);
-//   var elecArr = data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate;
-//   //console.log(data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate.length);
-// for (var i =0;i<elecArr.length;i++){
-//   //console.log(elecArr[i].ElectoratePrediction);
-//   const embed = {
-//       "title": "Vic Election 2018 ("+elecArr[i].LongName+")",
-//       "color": 9442302,
-//       "fields": [/*{
-//         name: "Winning Party: ",
-//         value: elecArr[i].LeadingCandidateSuppressed.Party.ShortName
-//       },*/ {
-//         name: "Percentage of votes counted: ",
-//         value: elecArr[i].CountedPct
-//       }]
-//     };
-//     message.channel.send({
-//       embed
-//     });
-//  // message.channel.stopTypting();
-// }// Print the HTML for the Google homepage.
+  console.log('body:');
+  var data = JSON.parse(body);
+  var elecArr = data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate;
+  //console.log(data.Erads.Elections.Election.Chambers.Chamber.Electorates.Electorate.length);
+for (var i =0;i<elecArr.length;i++){
+  //console.log(elecArr[i].ElectoratePrediction);
+  const embed = {
+      "title": "Vic Election 2018 ("+elecArr[i].LongName+")",
+      "color": 9442302,
+      "fields": [/*{
+        name: "Winning Party: ",
+        value: elecArr[i].LeadingCandidateSuppressed.Party.ShortName
+      },*/ {
+        name: "Percentage of votes counted: ",
+        value: elecArr[i].CountedPct
+      }]
+    };
+    message.channel.send({
+      embed
+    });
+ // message.channel.stopTypting();
+}// Print the HTML for the Google homepage.
   
  
-// });
-//   }
+});
+  }
  
   
   if(command==="modmail"){

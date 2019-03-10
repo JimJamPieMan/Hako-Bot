@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+
+<body onload="loadDoc()">
+  <script>
+    
+    
+    
+    
+    
+    function loadDoc() {
+   
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+     var obj = JSON.parse(this.responseText);
+     console.log(obj.colour);
+      document.body.style.backgroundColor = obj.colour;
+        
+    }
+  };
+  xhttp.open("GET", "/jamessipadcolour", true);
+  xhttp.send();
+}
+    setInterval(loadDoc,1);
+   
+       
+      </script>
+
+
+</body>
+</html>
